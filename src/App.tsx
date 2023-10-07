@@ -1,11 +1,7 @@
 import { useEffect, useState } from 'react'
 import './App.css'
-
-type Todo = {
-  id: number
-  todoName: string
-  todoStatus: boolean
-}
+import { Todo } from './types/index'
+import TodoItem from './components/TodoItem';
 
 function App() {
   // fetch api/getData
@@ -16,6 +12,11 @@ function App() {
   // fetch api/addData
   const [todoName, setTodoName] = useState('')
   const [todoStatus, setTodoStatus] = useState(false)
+
+  useEffect(() => {
+    fetchData();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const fetchData = async () => {
     try {
@@ -30,9 +31,24 @@ function App() {
     }
   }
 
-  useEffect(() => {
+  const deleteData = async (id:number) => {
+    await fetch(`/api/delData?id=${id}`, {
+      method: 'GET',
+    })
     fetchData();
-  }, []);
+  }
+
+  // const updateData = async (todo: Todo) => {
+  //   await fetch("/api/addData", {
+  //     method: "POST",
+  //     body: JSON.stringify({
+  //       todoId: todo.id,
+  //       todoName: todo.todoName,
+  //       todoStatus: todo.todoStatus,
+  //     }),
+  //   })
+  //   fetchData();
+  // }
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -67,18 +83,15 @@ function App() {
         <button type="submit">submit</button>
       </form>
       <h1>all Data</h1>
-      <ul>
+      <div>
         {isLoading && <p>...loading</p>}
         {isError && <p>Error!</p>}
         {
           todoData.map((todo) => (
-            <li key={todo.id}>
-              <p>{todo.todoName}</p>
-              <p>{todo.todoStatus}</p>
-            </li>
+            <TodoItem key={todo.id} todo={todo} onDelete={() => deleteData(todo.id)} onChangeStatus={() => fetchData()}/>
           ))
         }
-      </ul>
+      </div>
     </div>
   )
 }
