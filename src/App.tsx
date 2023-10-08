@@ -1,106 +1,4 @@
 import { useEffect, useState } from 'react'
-import './App.css'
-import { Todo } from './types/index'
-import TodoItem from './components/TodoItem'
-
-function App() {
-  // fetch api/getData
-  const [todoData, setTodoData] = useState<Todo[]>([])
-  const [isLoading, setLoading] = useState(true)
-  const [isError, setError] = useState(false)
-
-  // fetch api/addData
-  const [todoName, setTodoName] = useState('')
-  const [todoStatus, setTodoStatus] = useState(false)
-
-  useEffect(() => {
-    fetchData()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-
-  const fetchData = async () => {
-    try {
-      const response = await fetch(`/api/getData`)
-      const info = await response.json()
-      setTodoData(() => [...info])
-      console.log(todoData)
-    } catch (err) {
-      setError(true)
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const deleteData = async (id: number) => {
-    await fetch(`/api/delData?id=${id}`, {
-      method: 'GET',
-    })
-    fetchData()
-  }
-
-  // const updateData = async (todo: Todo) => {
-  //   await fetch("/api/addData", {
-  //     method: "POST",
-  //     body: JSON.stringify({
-  //       id: todo.id,
-  //       todoName: todo.todoName,
-  //       todoStatus: todo.todoStatus,
-  //     }),
-  //   })
-  //   fetchData();
-  // }
-
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault()
-    const res = await fetch('/api/addData', {
-      method: 'POST',
-      body: JSON.stringify({
-        todoName: todoName,
-        todoStatus: todoStatus,
-      }),
-    })
-    const result = await res.text()
-    console.log(result)
-    fetchData()
-    setTodoName('')
-    setTodoStatus(false)
-  }
-
-  const handleChangetodoName = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setTodoName(e.target.value)
-  }
-
-  const handleChangetodoStatus = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setTodoStatus(e.target.checked)
-  }
-
-  return (
-    <div className='App'>
-      <form onSubmit={handleSubmit}>
-        <input type='text' onChange={handleChangetodoName} value={todoName} />
-        <input type='checkbox' onChange={handleChangetodoStatus} checked={todoStatus} />
-        <button type='submit'>submit</button>
-      </form>
-      <h1>all Data</h1>
-      <div>
-        {isLoading && <p>...loading</p>}
-        {isError && <p>Error!</p>}
-        {todoData.map((todo) => (
-          <TodoItem
-            key={todo.id}
-            todo={todo}
-            onDelete={() => deleteData(todo.id)}
-            onChangeStatus={() => fetchData()}
-          />
-        ))}
-      </div>
-      <Container />
-    </div>
-  )
-}
-
-export default App
-
 import {
   DndContext,
   DragOverlay,
@@ -117,15 +15,9 @@ import {
 import { arrayMove, sortableKeyboardCoordinates } from '@dnd-kit/sortable'
 import Item from './components/Item'
 import SortableContainer from './components/SortableContainer'
-// import SortableContainer from "./SortableContainer";
-// import Item from "./Item";
-// import IssueForm from "./IssueForm";
+import './App.css'
 
-// 汚いコードでごめんなさい
-
-const Container = () => {
-  // ドラッグ&ドロップでソート可能なリスト
-
+function App() {
   interface Todo {
     id: number
     todoName: string
@@ -353,33 +245,137 @@ const Container = () => {
   console.log(list2)
   console.log(list3)
 
+  const [todoData, setTodoData] = useState<Todo[]>([])
+  const [isLoading, setLoading] = useState(true)
+  const [isError, setError] = useState(false)
+
+  const [todoName, setTodoName] = useState('')
+  const [todoStatus, setTodoStatus] = useState(false)
+
+  useEffect(() => {
+    fetchData()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  const fetchData = async () => {
+    try {
+      const response = await fetch(`/api/getData`)
+      const info = await response.json()
+      setTodoData(() => [...info])
+      console.log(todoData)
+    } catch (err) {
+      setError(true)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const deleteData = async (id: number) => {
+    await fetch(`/api/delData?id=${id}`, {
+      method: 'GET',
+    })
+    fetchData()
+  }
+
+  // const updateData = async (todo: Todo) => {
+  //   await fetch("/api/addData", {
+  //     method: "POST",
+  //     body: JSON.stringify({
+  //       id: todo.id,
+  //       todoName: todo.todoName,
+  //       todoStatus: todo.todoStatus,
+  //     }),
+  //   })
+  //   fetchData();
+  // }
+
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    const res = await fetch('/api/addData', {
+      method: 'POST',
+      body: JSON.stringify({
+        todoName: todoName,
+        todoStatus: todoStatus,
+      }),
+    })
+    const result = await res.text()
+    console.log(result)
+    fetchData()
+    setTodoName('')
+    setTodoStatus(false)
+  }
+
+  const handleChangetodoName = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setTodoName(e.target.value)
+  }
+
+  const handleChangetodoStatus = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setTodoStatus(e.target.checked)
+  }
+
   return (
-    <main className=''>
-      <div className='container'>
-        <h1 className='issue-title'>ISSUEリスト</h1>
-        <div className='issue-container flex justify-center align-middle w-full'>
-          <DndContext
-            sensors={sensors}
-            collisionDetection={closestCorners}
-            onDragStart={handleDragStart}
-            onDragOver={handleDragOver}
-            onDragEnd={handleDragEnd}
-          >
-            {/* SortableContainer */}
+    <div className='App'>
+      <form onSubmit={handleSubmit}>
+        <input type='text' onChange={handleChangetodoName} value={todoName} />
+        <input type='checkbox' onChange={handleChangetodoStatus} checked={todoStatus} />
+        <button type='submit'>submit</button>
+      </form>
+      <h1>all Data</h1>
+      {isLoading ? (
+        <div>loading...</div>
+      ) : isError ? (
+        <div>error</div>
+      ) : (
+        <main className=''>
+          <div className=''>
+            <h1 className='issue-title'>ISSUEリスト</h1>
+            <div className='issue-container flex justify-center align-middle w-full'>
+              <DndContext
+                sensors={sensors}
+                collisionDetection={closestCorners}
+                onDragStart={handleDragStart}
+                onDragOver={handleDragOver}
+                onDragEnd={handleDragEnd}
+              >
+                {/* SortableContainer */}
 
-            <SortableContainer id='yet' label='ToDo' items={items.yet} />
-
-            <SortableContainer id='doing' label='Doing' items={items.doing} />
-            <SortableContainer id='done' label='Done' items={items.done} />
-            {/* DragOverlay */}
-            <DragOverlay>
-              {activeId ? (
-                <Item name={findTodoName(activeId as number)} id={activeId as number} />
-              ) : null}
-            </DragOverlay>
-          </DndContext>
-        </div>
-      </div>
-    </main>
+                <SortableContainer
+                  id='yet'
+                  label='ToDo'
+                  items={items.yet}
+                  onDelete={deleteData}
+                />
+                <SortableContainer
+                  id='doing'
+                  label='Doing'
+                  items={items.doing}
+                  onDelete={deleteData}
+                />
+                <SortableContainer
+                  id='done'
+                  label='Done'
+                  items={items.done}
+                  onDelete={deleteData}
+                />
+                {/* DragOverlay */}
+                <DragOverlay>
+                  {activeId ? (
+                    <Item
+                      todo={{
+                        id: activeId as number,
+                        todoName: findTodoName(activeId as number)!,
+                        todoStatus: 'yet',
+                      }}
+                    />
+                  ) : null}
+                </DragOverlay>
+              </DndContext>
+            </div>
+          </div>
+        </main>
+      )}
+    </div>
   )
 }
+
+export default App

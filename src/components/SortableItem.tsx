@@ -1,20 +1,27 @@
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import { UniqueIdentifier } from '@dnd-kit/core'
 import Item from './Item'
+import { Todo } from '../types'
 
-const SortableItem: React.FC<{ id: UniqueIdentifier; name: string }> = ({ id, name }) => {
+interface ItemProps {
+  // 追加のpropsも許容する
+  todo: Todo
+  onDelete: (id: number) => Promise<void>
+}
+
+const SortableItem: React.FC<ItemProps> = ({ todo, onDelete }) => {
+  const id = todo.id
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id })
 
   return (
     <div
-      className=']'
+      className=''
       ref={setNodeRef}
       style={{ transform: CSS.Transform.toString(transform), transition }}
       {...attributes}
       {...listeners}
     >
-      <Item name={name} />
+      <Item todo={todo} onDelete={onDelete} />
     </div>
   )
 }

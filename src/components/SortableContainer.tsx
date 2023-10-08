@@ -7,9 +7,10 @@ interface Props {
   id: string
   label: string
   items: Todo[]
+  onDelete: (id: number) => Promise<void>
 }
 
-const SortableContainer: React.FC<Props> = ({ id, label, items }) => {
+const SortableContainer: React.FC<Props> = ({ id, label, items, onDelete }) => {
   const { setNodeRef } = useDroppable({
     id,
   })
@@ -27,7 +28,7 @@ const SortableContainer: React.FC<Props> = ({ id, label, items }) => {
     default:
   }
   return (
-    <div className='issue-item'>
+    <div className='issue-item mx-3'>
       <SortableContext id={id} items={items} strategy={rectSortingStrategy}>
         <div
           ref={setNodeRef}
@@ -37,8 +38,8 @@ const SortableContainer: React.FC<Props> = ({ id, label, items }) => {
             <h3 className='text-xl font-bold text-center'>{label}</h3>
           </div>
           <div className='items-container'>
-            {items.map((id) => (
-              <SortableItem key={id.id} id={id.id} name={id.todoName} />
+            {items.map((item) => (
+              <SortableItem key={item.id} todo={item} onDelete={onDelete} />
             ))}
           </div>
         </div>
