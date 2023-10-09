@@ -16,74 +16,13 @@ import { arrayMove, sortableKeyboardCoordinates } from '@dnd-kit/sortable'
 import Item from './components/Item'
 import SortableContainer from './components/SortableContainer'
 import './App.css'
+import { Todos, Todo } from './types'
 
 function App() {
-  interface Todo {
-    id: number
-    todoName: string
-    todoStatus: string
-  }
-
-  interface Todos {
-    yet: Todo[]
-    doing: Todo[]
-    done: Todo[]
-  }
-
   const [items, setItems] = useState<Todos>({
-    yet: [
-      {
-        id: 1,
-        todoName: 'A',
-        todoStatus: 'yet',
-      },
-      {
-        id: 2,
-        todoName: 'B',
-        todoStatus: 'yet',
-      },
-      {
-        id: 3,
-        todoName: 'C',
-        todoStatus: 'yet',
-      },
-    ],
-
-    doing: [
-      {
-        id: 4,
-        todoName: 'D',
-        todoStatus: 'doing',
-      },
-      {
-        id: 5,
-        todoName: 'E',
-        todoStatus: 'doing',
-      },
-      {
-        id: 6,
-        todoName: 'F',
-        todoStatus: 'doing',
-      },
-    ],
-
-    done: [
-      {
-        id: 7,
-        todoName: 'G',
-        todoStatus: 'done',
-      },
-      {
-        id: 8,
-        todoName: 'H',
-        todoStatus: 'done',
-      },
-      {
-        id: 9,
-        todoName: 'I',
-        todoStatus: 'done',
-      },
-    ],
+    yet: [],
+    doing: [],
+    done: [],
   })
 
   //リストのリソースid（リストの値）
@@ -131,8 +70,10 @@ function App() {
   }
 
   // ドラッグ開始時に発火する関数
-
   const handleDragStart = (event: DragStartEvent) => {
+    console.log('🕹')
+    console.log(event)
+
     const { active } = event
     //ドラッグしたリソースのid
     const id = active.id
@@ -232,11 +173,11 @@ function App() {
         ...items,
         [overContainer!]: arrayMove(items[overContainer!], activeIndex, overIndex),
       }))
+      handleChangePosition(id as number, overContainer!)
     }
     setActiveId(undefined)
   }
 
-  // itemsの状態確認用、idを返す
   const list1 = items.yet.map((item) => item.id)
   const list2 = items.doing.map((item) => item.id)
   const list3 = items.done.map((item) => item.id)
@@ -245,12 +186,13 @@ function App() {
   console.log(list2)
   console.log(list3)
 
-  const [todoData, setTodoData] = useState<Todo[]>([])
+  // ---------ここからはAPIの処理---------
+
   const [isLoading, setLoading] = useState(true)
   const [isError, setError] = useState(false)
 
   const [todoName, setTodoName] = useState('')
-  const [todoStatus, setTodoStatus] = useState(false)
+  const [todoStatus, setTodoStatus] = useState('yet')
 
   useEffect(() => {
     fetchData()
@@ -261,8 +203,14 @@ function App() {
     try {
       const response = await fetch(`/api/getData`)
       const info = await response.json()
-      setTodoData(() => [...info])
-      console.log(todoData)
+      // setTodoData(() => [...info])
+      setItems(() => ({
+        yet: info.filter((item: Todo) => item.todoStatus === 'yet'),
+        doing: info.filter((item: Todo) => item.todoStatus === 'doing'),
+        done: info.filter((item: Todo) => item.todoStatus === 'done'),
+      }))
+      // objectの中身を確認する
+      console.log('%o', items)
     } catch (err) {
       setError(true)
     } finally {
@@ -274,6 +222,20 @@ function App() {
     await fetch(`/api/delData?id=${id}`, {
       method: 'GET',
     })
+    fetchData()
+  }
+
+  // ドロップした時にDBのtodoStatusを更新する関数
+  const handleChangePosition = async (id: number, overContainer: string) => {
+    const res = await fetch('/api/addData', {
+      method: 'POST',
+      body: JSON.stringify({
+        id: id,
+        todoStatus: overContainer,
+      }),
+    })
+    const result = await res.text()
+    console.log(result)
     fetchData()
   }
 
@@ -289,7 +251,7 @@ function App() {
   //   fetchData();
   // }
 
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     const res = await fetch('/api/addData', {
       method: 'POST',
@@ -302,22 +264,17 @@ function App() {
     console.log(result)
     fetchData()
     setTodoName('')
-    setTodoStatus(false)
+    setTodoStatus('yet')
   }
 
   const handleChangetodoName = (e: React.ChangeEvent<HTMLInputElement>) => {
     setTodoName(e.target.value)
   }
 
-  const handleChangetodoStatus = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setTodoStatus(e.target.checked)
-  }
-
   return (
     <div className='App'>
       <form onSubmit={handleSubmit}>
         <input type='text' onChange={handleChangetodoName} value={todoName} />
-        <input type='checkbox' onChange={handleChangetodoStatus} checked={todoStatus} />
         <button type='submit'>submit</button>
       </form>
       <h1>all Data</h1>
@@ -361,11 +318,9 @@ function App() {
                 <DragOverlay>
                   {activeId ? (
                     <Item
-                      todo={{
-                        id: activeId as number,
-                        todoName: findTodoName(activeId as number)!,
-                        todoStatus: 'yet',
-                      }}
+                      id={activeId as number}
+                      findTodoName={findTodoName}
+                      findContainer={findContainer}
                     />
                   ) : null}
                 </DragOverlay>
