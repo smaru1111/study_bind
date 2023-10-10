@@ -28,13 +28,14 @@ const SortableContainer: React.FC<Props> = ({ id, label, items, onDelete }) => {
     default:
   }
   return (
-    <div className='issue-item mx-3'>
+    <div className='issue-item mx-3 w-[30%] h-full md:w-60'>
       <SortableContext id={id} items={items} strategy={rectSortingStrategy}>
         <div
           ref={setNodeRef}
-          className=' w=full border-2 border-gray-500/75 p-5 mt-2 rounded-md'
+          // スクロールバー
+          className=' w-full h-[450px] overflow-y-scroll border-black rounded-lg border-2 border-gray-500/75 pl-5 pr-3 py-5 mt-5'
         >
-          <div className={`issue-title-container ${titleStyle}`}>
+          <div className={`mb-6 ${titleStyle}`}>
             <h3 className='text-xl font-bold text-center'>{label}</h3>
           </div>
           <div className='items-container'>

@@ -280,7 +280,7 @@ function App() {
   }
 
   return (
-    <div className='App'>
+    <div className='App h-[100vh] flex flex-col px-9 py-5'>
       <form onSubmit={handleSubmit}>
         <input type='text' onChange={handleChangetodoName} value={todoName} />
         <button type='submit'>submit</button>
@@ -291,51 +291,49 @@ function App() {
       ) : isError ? (
         <div>error</div>
       ) : (
-        <main className=''>
-          <div className=''>
-            <h1 className='issue-title'>ISSUEリスト</h1>
-            <div className='issue-container flex justify-center align-middle w-full'>
-              <DndContext
-                sensors={sensors}
-                collisionDetection={closestCorners}
-                onDragStart={handleDragStart}
-                onDragOver={handleDragOver}
-                onDragEnd={handleDragEnd}
-              >
-                {/* SortableContainer */}
+        <>
+          <h1 className='issue-title'>ISSUEリスト</h1>
+          <div className='issue-container flex justify-center align-middle w-full h-full'>
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCorners}
+              onDragStart={handleDragStart}
+              onDragOver={handleDragOver}
+              onDragEnd={handleDragEnd}
+            >
+              {/* SortableContainer */}
 
-                <SortableContainer
-                  id='yet'
-                  label='ToDo'
-                  items={items.yet}
-                  onDelete={deleteData}
-                />
-                <SortableContainer
-                  id='doing'
-                  label='Doing'
-                  items={items.doing}
-                  onDelete={deleteData}
-                />
-                <SortableContainer
-                  id='done'
-                  label='Done'
-                  items={items.done}
-                  onDelete={deleteData}
-                />
-                {/* DragOverlay */}
-                <DragOverlay>
-                  {activeId ? (
-                    <Item
-                      id={activeId as number}
-                      findTodoName={findTodoName}
-                      findContainer={findContainer}
-                    />
-                  ) : null}
-                </DragOverlay>
-              </DndContext>
-            </div>
+              <SortableContainer
+                id='yet'
+                label='Yet'
+                items={items.yet}
+                onDelete={deleteData}
+              />
+              <SortableContainer
+                id='doing'
+                label='Doing'
+                items={items.doing}
+                onDelete={deleteData}
+              />
+              <SortableContainer
+                id='done'
+                label='Done'
+                items={items.done}
+                onDelete={deleteData}
+              />
+              {/* DragOverlay */}
+              <DragOverlay>
+                {activeId ? (
+                  <Item
+                    id={activeId as number}
+                    findTodoName={findTodoName}
+                    findContainer={findContainer}
+                  />
+                ) : null}
+              </DragOverlay>
+            </DndContext>
           </div>
-        </main>
+        </>
       )}
     </div>
   )
