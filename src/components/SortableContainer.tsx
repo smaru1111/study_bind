@@ -28,7 +28,7 @@ const SortableContainer: React.FC<Props> = ({ id, label, items, onDelete }) => {
     default:
   }
   return (
-    <div className='issue-item mx-3 w-[30%] h-full md:w-60'>
+    <div className=' w-[30%] mx-3 h-full '>
       <SortableContext id={id} items={items} strategy={rectSortingStrategy}>
         <div
           ref={setNodeRef}

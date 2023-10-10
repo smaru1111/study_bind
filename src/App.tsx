@@ -280,20 +280,33 @@ function App() {
   }
 
   return (
-    <div className='App h-[100vh] flex flex-col px-9 py-5'>
-      <form onSubmit={handleSubmit}>
-        <input type='text' onChange={handleChangetodoName} value={todoName} />
-        <button type='submit'>submit</button>
+    <div className='App h-[100vh] flex flex-col px-9 md:px-20 py-5'>
+      <h1 className='text-3xl font-bold text-center mb-5'>Todo App</h1>
+      <form
+        onSubmit={handleSubmit}
+        className='flex justify-center align-middle w-full h-full px-3'
+      >
+        <input
+          type='text'
+          onChange={handleChangetodoName}
+          value={todoName}
+          className='border border-gray-300 p-2 rounded-md focus:outline-none focus:border-blue-500 flex-grow'
+          placeholder='Todoを入力してください'
+        />
+        <button
+          type='submit'
+          className='bg-blue-500 text-white px-4 py-2 ml-3 rounded-md hover:bg-blue-600 focus:outline-none focus:bg-blue-600'
+        >
+          submit
+        </button>
       </form>
-      <h1>all Data</h1>
       {isLoading ? (
         <div>loading...</div>
       ) : isError ? (
         <div>error</div>
       ) : (
         <>
-          <h1 className='issue-title'>ISSUEリスト</h1>
-          <div className='issue-container flex justify-center align-middle w-full h-full'>
+          <div className='flex justify-center align-middle h-full'>
             <DndContext
               sensors={sensors}
               collisionDetection={closestCorners}
