@@ -28,12 +28,18 @@ const Item: React.FC<ItemProps> = ({
     return (
       <div className='w-full h-[50px] flex items-center justify-center px-10 my-2.5 border border-black rounded-lg bg-gray-100'>
         {todo.todoName}
+        <button className='ml-5 text-red-500 z-50' onClick={() => onDelete!(todo.id)}>
+          削除
+        </button>
       </div>
     )
   } else {
     return (
       <div className='w-full h-[50px] flex items-center justify-center px-10 my-2.5 border border-black rounded-lg bg-gray-100'>
         {todo.todoName}
+        <button className='ml-5 text-red-500 z-50' onClick={() => onDelete!(todo.id)}>
+          削除
+        </button>
       </div>
     )
   }

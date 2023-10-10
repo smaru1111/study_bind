@@ -4,7 +4,7 @@ import {
   DragOverlay,
   closestCorners,
   KeyboardSensor,
-  PointerSensor,
+  MouseSensor,
   useSensor,
   useSensors,
   DragOverEvent,
@@ -29,8 +29,13 @@ function App() {
   const [activeId, setActiveId] = useState<number | string | undefined>(undefined)
 
   // ドラッグの開始、移動、終了などにどのような入力を許可するかを決めるprops
+  const mouseSensor = useSensor(MouseSensor, {
+    activationConstraint: {
+      distance: 5, // 5px ドラッグした時にソート機能を有効にする
+    },
+  })
   const sensors = useSensors(
-    useSensor(PointerSensor),
+    mouseSensor,
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
     }),
@@ -71,9 +76,6 @@ function App() {
 
   // ドラッグ開始時に発火する関数
   const handleDragStart = (event: DragStartEvent) => {
-    console.log('🕹')
-    console.log(event)
-
     const { active } = event
     //ドラッグしたリソースのid
     const id = active.id
@@ -88,9 +90,8 @@ function App() {
     //ドロップした場所にあったリソースのid
     const overId = over?.id
 
-    console.log(event)
-    console.log(id)
-    console.log('aaa' + over?.id)
+    console.log('❤active.id is ' + active.id)
+    console.log('💋over.id is ' + over?.id)
 
     if (!overId) return
 
@@ -99,8 +100,8 @@ function App() {
     const activeContainer = findContainer(id as number)
     const overContainer = findContainer(over?.id as number)
 
-    console.log('activeContainer is' + activeContainer)
-    console.log('overContainer is' + overContainer)
+    console.log('activeContainer is ' + activeContainer)
+    console.log('overContainer is ' + overContainer)
 
     if (!activeContainer || !overContainer || activeContainer === overContainer) {
       // コンテナが同じ場合
@@ -167,14 +168,17 @@ function App() {
     const activeIndex = items[activeContainer!].findIndex((item: Todo) => item.id === id)
     const overIndex = items[overContainer!].findIndex((item: Todo) => item.id === overId)
 
+    console.log('👍activeIndex' + activeIndex)
+    console.log('👍overIndex' + overIndex)
+
     // ドロップ時にリストの要素をとっかえひっかえのアレコレ
     if (activeIndex !== overIndex) {
       setItems((items) => ({
         ...items,
         [overContainer!]: arrayMove(items[overContainer!], activeIndex, overIndex),
       }))
-      handleChangePosition(id as number, overContainer!)
     }
+    handleChangePosition(id as number, overContainer!)
     setActiveId(undefined)
   }
 
@@ -227,16 +231,18 @@ function App() {
 
   // ドロップした時にDBのtodoStatusを更新する関数
   const handleChangePosition = async (id: number, overContainer: string) => {
+    console.log('👍overContainer' + overContainer)
+
     const res = await fetch('/api/addData', {
       method: 'POST',
       body: JSON.stringify({
         id: id,
+        todoName: findTodoName(id),
         todoStatus: overContainer,
       }),
     })
     const result = await res.text()
     console.log(result)
-    fetchData()
   }
 
   // const updateData = async (todo: Todo) => {
@@ -250,12 +256,15 @@ function App() {
   //   })
   //   fetchData();
   // }
-
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
+    setTodoStatus('yet')
+    console.log('😁handleSubmit')
+
     const res = await fetch('/api/addData', {
       method: 'POST',
       body: JSON.stringify({
+        id: Math.floor(Math.random() * 100000),
         todoName: todoName,
         todoStatus: todoStatus,
       }),
@@ -264,7 +273,6 @@ function App() {
     console.log(result)
     fetchData()
     setTodoName('')
-    setTodoStatus('yet')
   }
 
   const handleChangetodoName = (e: React.ChangeEvent<HTMLInputElement>) => {
