@@ -284,7 +284,7 @@ function App() {
       <h1 className='text-3xl font-bold text-center mb-5'>Todo App</h1>
       <form
         onSubmit={handleSubmit}
-        className='flex justify-center align-middle w-full h-full px-3'
+        className='flex justify-center align-middle w-full px-3'
       >
         <input
           type='text'
@@ -301,12 +301,12 @@ function App() {
         </button>
       </form>
       {isLoading ? (
-        <div>loading...</div>
+        <div className='flex justify-center items-center'>loading...</div>
       ) : isError ? (
-        <div>error</div>
+        <div className='flex justify-center items-center'>error</div>
       ) : (
         <>
-          <div className='flex justify-center align-middle h-full'>
+          <div className='flex justify-center align-middle h-full max-h-[calc(100%-90px)] '>
             <DndContext
               sensors={sensors}
               collisionDetection={closestCorners}
